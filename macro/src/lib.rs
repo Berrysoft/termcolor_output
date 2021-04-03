@@ -71,7 +71,7 @@ pub use termcolor_output_impl;
 /// arguments. The arguments may be either formattable with the corresponding formatter (`Display`
 /// for `{}`, `Debug` for `{:?}`, etc.), or the _control sequences_, which are written in
 /// macro-like style:
-/// - `reset!()` yields call to [`ColorSpec::clear`][termcolor::ColorSpec::clear];
+/// - `reset!()` yields call to [`WriteColor::reset`][termcolor::WriteColor::reset];
 /// - `fg!(color)`, `bg!(color)`, `bold!(bool)`, `underline!(bool)` and `intense!(bool)` are
 /// translated into corresponding `ColorSpec::set_*` calls with the provided arguments.
 ///
@@ -141,24 +141,51 @@ pub use termcolor_output_impl;
 #[macro_export]
 macro_rules! colored {
     ($($arg:tt)*) => {{
-        use $crate::termcolor::WriteColor;
-        use $crate::std::io::Write;
-        use $crate::WriteColorGuard;
+        #[allow(unused_imports)]
+        use $crate::{std::io::Write, termcolor::WriteColor, WriteColorGuard};
         $crate::termcolor_output_impl::colored_impl!($($arg)*)
     }}
 }
 
-/// A convenience function, serving the role of `writeln!` macro.
+/// The macro writing colored text, with a newline appended.
+///
+/// For more information, see [`colored!`][termcolor_output::colored] macro.
+///
+/// [`writeln!`]: https://doc.rust-lang.org/std/macro.writeln.html
+/// [`std::io::Result<()>`]: https://doc.rust-lang.org/std/io/type.Result.html
+#[macro_export]
+macro_rules! coloredln {
+    ($w:expr) => {{
+        write!($w, "\n")
+    }};
+    ($w:expr, $($arg:tt)*) => {{
+        $crate::colored!($w, $($arg)*).and_then(|()| $crate::coloredln!($w))
+    }}
+}
+
+/// A convenience function, serving the role of `write!` macro.
 ///
 /// This function accepts a closure containing all necessary [`colored`]! calls.
-/// It will clear the writer style, run the closure, clear the writer style again
-/// and write a newline.
-#[allow(unused_imports)]
-pub fn colored_ln<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Result<()>>(
+/// It will reset the writer style, run the closure, reset the writer style again.
+pub fn colored_guard<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Result<()>>(
     buf: &mut W,
     func: F,
 ) -> std::io::Result<()> {
-    colored!(buf, "{}", reset!())?;
+    buf.reset()?;
     func(buf)?;
-    colored!(buf, "{}\n", reset!())
+    buf.reset()
+}
+
+/// A convenience function, serving the role of `write!` macro.
+///
+/// This function accepts a closure containing all necessary [`colored`]! calls.
+/// It will reset the writer style, run the closure, reset the writer style again
+/// and write a newline.
+pub fn coloredln_guard<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Result<()>>(
+    buf: &mut W,
+    func: F,
+) -> std::io::Result<()> {
+    buf.reset()?;
+    func(buf)?;
+    coloredln!(buf, "{}", reset!())
 }

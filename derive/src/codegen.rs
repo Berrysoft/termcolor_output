@@ -149,35 +149,40 @@ fn raw(entry: RawOutput) -> TokenStream {
 }
 
 fn control(seq: ControlSeq) -> TokenStream {
-    ts!(let head =
-        tt!(Ident("__spec__", Span::call_site())),
-        tt!(Punct('.', Alone)),
-    );
-    let change_spec: TokenStream = match seq {
+    match seq {
         ControlSeq::Reset => ts!(
-            tt!(Ident("clear", Span::call_site())),
+            tt!(Ident("__writer__", Span::call_site())),
+            tt!(Punct('.', Alone)),
+            tt!(Ident("reset", Span::call_site())),
             tt!(Group(Parenthesis, ts!())),
+            tt!(Punct('?', Alone)),
             tt!(Punct(';', Alone)),
         ),
-        ControlSeq::Command(cmd, inner) => ts!(
-            tt!(Ident(&(String::from("set_") + &cmd), Span::call_site())),
-            tt!(Group(Parenthesis, inner)),
-            tt!(Punct(';', Alone)),
-        ),
-    };
-    ts!(let set_spec =
-        tt!(Ident("__writer__", Span::call_site())),
-        tt!(Punct('.', Alone)),
-        tt!(Ident("set_color", Span::call_site())),
-        tt!(Group(Parenthesis, ts!(
-            tt!(Punct('&', Alone)),
-            tt!(Ident("__spec__", Span::call_site()))
-        ))),
-        tt!(Punct('?', Alone)),
-        tt!(Punct(';', Alone)),
-    );
-    head.into_iter()
-        .chain(change_spec.into_iter())
-        .chain(set_spec.into_iter())
-        .collect()
+        ControlSeq::Command(cmd, inner) => {
+            ts!(let head =
+                tt!(Ident("__spec__", Span::call_site())),
+                tt!(Punct('.', Alone)),
+            );
+            ts!(let change_spec=
+                tt!(Ident(&(String::from("set_") + &cmd), Span::call_site())),
+                tt!(Group(Parenthesis, inner)),
+                tt!(Punct(';', Alone)),
+            );
+            ts!(let set_spec =
+                tt!(Ident("__writer__", Span::call_site())),
+                tt!(Punct('.', Alone)),
+                tt!(Ident("set_color", Span::call_site())),
+                tt!(Group(Parenthesis, ts!(
+                    tt!(Punct('&', Alone)),
+                    tt!(Ident("__spec__", Span::call_site()))
+                ))),
+                tt!(Punct('?', Alone)),
+                tt!(Punct(';', Alone)),
+            );
+            head.into_iter()
+                .chain(change_spec.into_iter())
+                .chain(set_spec.into_iter())
+                .collect()
+        }
+    }
 }
