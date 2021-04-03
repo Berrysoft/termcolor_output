@@ -7,4 +7,3 @@ error[E0599]: the method `guard` exists for type `u32`, but its trait bounds wer
   = note: the following trait bounds were not satisfied:
           `u32: WriteColor`
           which is required by `u32: termcolor_output::WriteColorGuard`
-  = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)

@@ -16,8 +16,8 @@ use codegen::*;
 use parse::*;
 use types::*;
 
-#[proc_macro_derive(ColoredOutput)]
-pub fn colored_derive(input: TokenStream) -> TokenStream {
+#[proc_macro]
+pub fn colored_impl(input: TokenStream) -> TokenStream {
     let body = parse_input(input)
         .and_then(|input| {
             let MacroInput {
@@ -38,6 +38,6 @@ pub fn colored_derive(input: TokenStream) -> TokenStream {
                 .collect())
         })
         .unwrap_or_else(|err| compile_error(err));
-    let out = macro_wrapper(closure_wrapper(body));
+    let out = closure_wrapper(body);
     out
 }

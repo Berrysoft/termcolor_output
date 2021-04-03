@@ -18,8 +18,6 @@
 //! [`termcolor`]: http://docs.rs/termcolor
 //! [`write!`]: https://doc.rust-lang.org/stable/std/macro.write.html
 
-trait ColoredOutput {}
-
 /// Extension trait for [`WriteColor`] instances.
 ///
 /// This trait is not intended for public use. Its only purpose is to allow us check if the
@@ -143,15 +141,10 @@ pub use termcolor_output_impl;
 #[macro_export]
 macro_rules! colored {
     ($($arg:tt)*) => {{
-        use $crate::termcolor_output_impl::ColoredOutput;
         use $crate::termcolor::WriteColor;
         use $crate::std::io::Write;
         use $crate::WriteColorGuard;
-        #[derive(ColoredOutput)]
-        enum __Writer {
-            Data = (stringify!($($arg)*), 0).1
-        }
-        colored_impl!()
+        $crate::termcolor_output_impl::colored_impl!($($arg)*)
     }}
 }
 
