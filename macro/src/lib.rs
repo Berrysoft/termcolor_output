@@ -156,6 +156,8 @@ macro_rules! colored {
 #[macro_export]
 macro_rules! coloredln {
     ($w:expr) => {{
+        #[allow(unused_imports)]
+        use $crate::std::io::Write;
         write!($w, "\n")
     }};
     ($w:expr, $($arg:tt)*) => {{
