@@ -1,14 +1,14 @@
 [package]
 name = "termcolor_output"
-version = "1.0.0-rc.3"
+version = "1.0.0"
 authors = ["Cerberuser"]
 edition = "2018"
 description = "Interface crate for styled output to termcolor through macro."
 license = "MIT"
 
 [dependencies]
-termcolor_output_impl = "1.0.0-rc.3"
-termcolor = "1.0"
+termcolor_output_impl = "1.0.0"
+termcolor = "1.1"
 
 [dev-dependencies]
 trybuild = "1.0"

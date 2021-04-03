@@ -1,8 +1,10 @@
-error[E0599]: no method named `guard` found for type `u32` in the current scope
+error[E0599]: the method `guard` exists for type `u32`, but its trait bounds were not satisfied
  --> $DIR/not_a_writer.rs:5:14
   |
 5 |     colored!(not_a_writer, "test");
-  |              ^^^^^^^^^^^^
+  |              ^^^^^^^^^^^^ method cannot be called on `u32` due to unsatisfied trait bounds
   |
-  = note: the method `guard` exists but the following trait bounds were not satisfied:
-          `u32 : termcolor_output::WriteColorGuard`
+  = note: the following trait bounds were not satisfied:
+          `u32: WriteColor`
+          which is required by `u32: termcolor_output::WriteColorGuard`
+  = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)

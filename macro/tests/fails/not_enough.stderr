@@ -3,3 +3,5 @@ error: Not enough input parameters for this format string
   |
 5 |     colored!(writer, "Before first - {}, then - {:?}, or even {{this}}: {:b}!");
   |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)
