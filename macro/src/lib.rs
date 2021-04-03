@@ -149,7 +149,7 @@ macro_rules! colored {
 
 /// The macro writing colored text, with a newline appended.
 ///
-/// For more information, see [`colored!`][termcolor_output::colored] macro.
+/// For more information, see [`colored!`] macro.
 ///
 /// [`writeln!`]: https://doc.rust-lang.org/std/macro.writeln.html
 /// [`std::io::Result<()>`]: https://doc.rust-lang.org/std/io/type.Result.html
@@ -167,7 +167,7 @@ macro_rules! coloredln {
 
 /// A convenience function, serving the role of `write!` macro.
 ///
-/// This function accepts a closure containing all necessary [`colored`]! calls.
+/// This function accepts a closure containing all necessary [`colored!`] calls.
 /// It will reset the writer style, run the closure, reset the writer style again.
 pub fn colored_guard<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Result<()>>(
     buf: &mut W,
@@ -180,7 +180,7 @@ pub fn colored_guard<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Res
 
 /// A convenience function, serving the role of `write!` macro.
 ///
-/// This function accepts a closure containing all necessary [`colored`]! calls.
+/// This function accepts a closure containing all necessary [`colored!`] calls.
 /// It will reset the writer style, run the closure, reset the writer style again
 /// and write a newline.
 pub fn coloredln_guard<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Result<()>>(
