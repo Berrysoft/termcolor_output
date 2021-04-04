@@ -164,7 +164,7 @@ macro_rules! writeln {
     }}
 }
 
-use std::io::Result;
+use std::result::Result;
 use termcolor::WriteColor;
 
 /// A convenience function, reset the writer before and after
@@ -179,11 +179,14 @@ use termcolor::WriteColor;
 /// tco::writeln!(writer, "No styles here.").unwrap();
 /// # }
 /// ```
-pub fn reset_guard<W, F>(buf: &mut W, func: F) -> Result<()>
+pub fn reset_guard<W, F, E>(buf: &mut W, func: F) -> Result<(), E>
 where
     W: WriteColor,
-    F: FnOnce(&mut W) -> Result<()>,
+    F: FnOnce(&mut W) -> Result<(), E>,
+    E: From<std::io::Error>,
 {
     buf.reset()?;
-    func(buf).and_then(|()| buf.reset())
+    func(buf)?;
+    buf.reset()?;
+    Ok(())
 }
