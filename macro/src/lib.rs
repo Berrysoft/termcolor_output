@@ -149,16 +149,14 @@ macro_rules! write {
 
 /// The macro writing colored text, with a newline appended.
 ///
-/// For more information, see [`print!`] macro.
+/// For more information, see [`write!`] macro.
 ///
 /// [`writeln!`]: https://doc.rust-lang.org/std/macro.writeln.html
 /// [`std::io::Result<()>`]: https://doc.rust-lang.org/std/io/type.Result.html
 #[macro_export]
 macro_rules! writeln {
     ($w:expr) => {{
-        #[allow(unused_imports)]
-        use $crate::std::io::Write;
-        write!($w, "\n")
+        $crate::write!($w, "\n")
     }};
     ($w:expr, $($arg:tt)*) => {{
         $crate::write!($w, $($arg)*).and_then(|()| $crate::writeln!($w))

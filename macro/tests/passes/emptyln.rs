@@ -3,7 +3,7 @@ use termcolor_output as tco;
 
 fn main() {
     let mut w: NoColor<Vec<u8>> = NoColor::new(vec![]);
-    match tco::write!(w, "Text: {}, after it - some more", "Text") {
+    match tco::writeln!(w) {
         Ok(_) => {}
         Err(_) => {}
     };
