@@ -30,27 +30,28 @@
 /// ## Example
 ///
 /// ```compile_fail
-/// use termcolor_output::colored;
+/// use termcolor_output as tco;
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// colored!(0u8, "This won't be written")?;
+/// tco::write!(0u8, "This won't be written")?;
 /// # Ok(())
 /// # }
 /// ```
 ///
 /// This example yields the following error:
 /// ```text
-/// error[E0599]: no method named `guard` found for type `u8` in the current scope
-///  --> src/lib.rs:37:1
-///    |
-///  5 | colored!(0u8, "This won't be written")?;
-///    |          ^^^                          
-///    |
-///    = note: the method `guard` exists but the following trait bounds were not satisfied:
-///                    `u8 : termcolor_output::WriteColorGuard`
+/// error[E0599]: the method `guard` exists for type `u8`, but its trait bounds were not satisfied
+///  --> src\lib.rs:35:13
+///   |
+/// 5 | tco::write!(0u8, "This won't be written")?;
+///   |             ^^^ method cannot be called on `u8` due to unsatisfied trait bounds
+///   |
+///   = note: the following trait bounds were not satisfied:
+///           `u8: WriteColor`
+///           which is required by `u8: WriteColorGuard`
 /// ```
 ///
 /// [`WriteColor`]: https://docs.rs/termcolor/1.0.5/termcolor/trait.WriteColor.html
-/// [`colored`]: colored
+/// [`write!`]: write
 pub trait WriteColorGuard {
     fn guard(&mut self) -> &mut Self {
         self
@@ -161,4 +162,28 @@ macro_rules! writeln {
     ($w:expr, $($arg:tt)*) => {{
         $crate::write!($w, $($arg)*).and_then(|()| $crate::writeln!($w))
     }}
+}
+
+use std::io::Result;
+use termcolor::WriteColor;
+
+/// A convenience function, reset the writer before and after
+/// some [`write!`] or [`writeln!`] calls.
+///
+/// ## Examples
+/// ```
+/// use termcolor_output as tco;
+/// # fn write(writer: &mut impl termcolor::WriteColor) {
+/// # use termcolor::Color;
+/// tco::reset_guard(writer, |writer| tco::writeln!(writer, "Hello world with {}some styles!", fg!(Some(Color::Blue)))).unwrap();
+/// tco::writeln!(writer, "No styles here.").unwrap();
+/// # }
+/// ```
+pub fn reset_guard<W, F>(buf: &mut W, func: F) -> Result<()>
+where
+    W: WriteColor,
+    F: FnOnce(&mut W) -> Result<()>,
+{
+    buf.reset()?;
+    func(buf).and_then(|()| buf.reset())
 }
