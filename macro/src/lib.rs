@@ -175,18 +175,23 @@ use termcolor::WriteColor;
 /// use termcolor_output as tco;
 /// # fn write(writer: &mut impl termcolor::WriteColor) {
 /// # use termcolor::Color;
-/// tco::reset_guard(writer, |writer| tco::writeln!(writer, "Hello world with {}some styles!", fg!(Some(Color::Blue)))).unwrap();
+/// tco::ResetGuard::run(writer, |writer| tco::writeln!(writer, "Hello world with {}some styles!", fg!(Some(Color::Blue)))).unwrap();
 /// tco::writeln!(writer, "No styles here.").unwrap();
 /// # }
 /// ```
-pub fn reset_guard<W, F, E>(buf: &mut W, func: F) -> Result<(), E>
-where
-    W: WriteColor,
-    F: FnOnce(&mut W) -> Result<(), E>,
-    E: From<std::io::Error>,
-{
-    buf.reset()?;
-    func(buf)?;
-    buf.reset()?;
-    Ok(())
+pub struct ResetGuard<E: From<std::io::Error>> {
+    _marker: std::marker::PhantomData<E>,
+}
+
+impl<E: From<std::io::Error>> ResetGuard<E> {
+    pub fn run<W, F>(buf: &mut W, func: F) -> Result<(), E>
+    where
+        W: WriteColor,
+        F: FnOnce(&mut W) -> Result<(), E>,
+    {
+        buf.reset()?;
+        func(buf)?;
+        buf.reset()?;
+        Ok(())
+    }
 }
