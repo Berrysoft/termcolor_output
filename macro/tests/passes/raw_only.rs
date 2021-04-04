@@ -1,9 +1,9 @@
 use termcolor::NoColor;
-use termcolor_output::colored;
+use termcolor_output as tco;
 
 fn main() {
     let mut w: NoColor<Vec<u8>> = NoColor::new(vec![]);
-    match colored!(
+    match tco::write!(
         w,
         "Text: {}\nText (escaped): {:?}\nNumbers pair: {:?}\nOption: {:#?}",
         "Text 1",

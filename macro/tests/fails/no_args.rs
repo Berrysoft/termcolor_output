@@ -1,5 +1,5 @@
-use termcolor_output::*;
+use termcolor_output as tco;
 
 fn main() {
-    colored!();
+    tco::write!();
 }

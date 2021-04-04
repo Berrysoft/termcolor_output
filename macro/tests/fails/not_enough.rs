@@ -1,6 +1,9 @@
-use termcolor_output::*;
+use termcolor_output as tco;
 
 fn main() {
     let writer: Vec<u8> = vec![];
-    colored!(writer, "Before first - {}, then - {:?}, or even {{this}}: {:b}!");
+    tco::write!(
+        writer,
+        "Before first - {}, then - {:?}, or even {{this}}: {:b}!"
+    );
 }

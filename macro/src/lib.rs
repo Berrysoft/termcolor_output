@@ -92,29 +92,29 @@ pub use termcolor_output_impl;
 ///
 /// Simple formatting is provided in exactly the same way as for standard writes:
 /// ```
-/// # use termcolor_output::colored;
+/// use termcolor_output as tco;
 /// # fn write(writer: &mut impl termcolor::WriteColor) {
-/// colored!(writer, "This text is {} styled", "not").unwrap();
+/// tco::write!(writer, "This text is {} styled", "not").unwrap();
 /// # }
 /// ```
 ///
 /// Styled formatting is provided by using any formatter argument in format string, wherever you
 /// need to apply the style:
 /// ```
-/// # use termcolor_output::colored;
+/// use termcolor_output as tco;
 /// # fn write(writer: &mut impl termcolor::WriteColor) {
 /// # use termcolor::Color;
-/// colored!(writer, "This text is not styled\n{}And this is colored", fg!(Some(Color::Blue))).unwrap();
+/// tco::write!(writer, "This text is not styled\n{}And this is colored", fg!(Some(Color::Blue))).unwrap();
 /// # }
 /// ```
 ///
 /// You can chain several styling commands by specifying several formatter arguments without text
 /// between them:
 /// ```
-/// # use termcolor_output::colored;
+/// use termcolor_output as tco;
 /// # fn write(writer: &mut impl termcolor::WriteColor) {
 /// # use termcolor::Color;
-/// colored!(
+/// tco::write!(
 ///     writer,
 ///     "{}{}{}This text is bold blue on yellow background
 ///      {}{}{}And this has default colors, but is bold and underlined",
@@ -129,17 +129,17 @@ pub use termcolor_output_impl;
 /// And, of course, you can mix ordinary formatting outputs with the control sequences:
 ///
 /// ```
-/// # use termcolor_output::colored;
+/// use termcolor_output as tco;
 /// # fn write(writer: &mut impl termcolor::WriteColor) {
 /// # use termcolor::Color;
-/// colored!(writer, "{}{:?}{} unwraps to {}", bold!(true), Some(0), bold!(false), 0).unwrap();
+/// tco::write!(writer, "{}{:?}{} unwraps to {}", bold!(true), Some(0), bold!(false), 0).unwrap();
 /// # }
 /// ```
 ///
 /// [`write!`]: https://doc.rust-lang.org/std/macro.write.html
 /// [`std::io::Result<()>`]: https://doc.rust-lang.org/std/io/type.Result.html
 #[macro_export]
-macro_rules! colored {
+macro_rules! write {
     ($($arg:tt)*) => {{
         #[allow(unused_imports)]
         use $crate::{std::io::Write, termcolor::WriteColor, WriteColorGuard};
@@ -149,45 +149,18 @@ macro_rules! colored {
 
 /// The macro writing colored text, with a newline appended.
 ///
-/// For more information, see [`colored!`] macro.
+/// For more information, see [`print!`] macro.
 ///
 /// [`writeln!`]: https://doc.rust-lang.org/std/macro.writeln.html
 /// [`std::io::Result<()>`]: https://doc.rust-lang.org/std/io/type.Result.html
 #[macro_export]
-macro_rules! coloredln {
+macro_rules! writeln {
     ($w:expr) => {{
         #[allow(unused_imports)]
         use $crate::std::io::Write;
         write!($w, "\n")
     }};
     ($w:expr, $($arg:tt)*) => {{
-        $crate::colored!($w, $($arg)*).and_then(|()| $crate::coloredln!($w))
+        $crate::write!($w, $($arg)*).and_then(|()| $crate::writeln!($w))
     }}
-}
-
-/// A convenience function, serving the role of `write!` macro.
-///
-/// This function accepts a closure containing all necessary [`colored!`] calls.
-/// It will reset the writer style, run the closure, reset the writer style again.
-pub fn colored_guard<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Result<()>>(
-    buf: &mut W,
-    func: F,
-) -> std::io::Result<()> {
-    buf.reset()?;
-    func(buf)?;
-    buf.reset()
-}
-
-/// A convenience function, serving the role of `write!` macro.
-///
-/// This function accepts a closure containing all necessary [`colored!`] calls.
-/// It will reset the writer style, run the closure, reset the writer style again
-/// and write a newline.
-pub fn coloredln_guard<W: termcolor::WriteColor, F: FnOnce(&mut W) -> std::io::Result<()>>(
-    buf: &mut W,
-    func: F,
-) -> std::io::Result<()> {
-    buf.reset()?;
-    func(buf)?;
-    coloredln!(buf, "{}", reset!())
 }

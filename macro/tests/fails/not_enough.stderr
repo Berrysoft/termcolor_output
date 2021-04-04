@@ -1,5 +1,5 @@
 error: Not enough input parameters for this format string
- --> $DIR/not_enough.rs:5:22
+ --> $DIR/not_enough.rs:7:9
   |
-5 |     colored!(writer, "Before first - {}, then - {:?}, or even {{this}}: {:b}!");
-  |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 |         "Before first - {}, then - {:?}, or even {{this}}: {:b}!"
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

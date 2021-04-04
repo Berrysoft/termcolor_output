@@ -1,8 +1,8 @@
 error[E0277]: `Option<()>` doesn't implement `std::fmt::Display`
- --> $DIR/wrong_types_args.rs:8:35
+ --> $DIR/wrong_types_args.rs:8:38
   |
-8 |     match colored!(w, "{}{}{:?}", Some(()), vec![1u8], NonDebuggable) {
-  |                                   ^^^^^^^^ `Option<()>` cannot be formatted with the default formatter
+8 |     match tco::write!(w, "{}{}{:?}", Some(()), vec![1u8], NonDebuggable) {
+  |                                      ^^^^^^^^ `Option<()>` cannot be formatted with the default formatter
   |
   = help: the trait `std::fmt::Display` is not implemented for `Option<()>`
   = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
@@ -10,10 +10,10 @@ error[E0277]: `Option<()>` doesn't implement `std::fmt::Display`
   = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0277]: `Vec<u8>` doesn't implement `std::fmt::Display`
- --> $DIR/wrong_types_args.rs:8:45
+ --> $DIR/wrong_types_args.rs:8:48
   |
-8 |     match colored!(w, "{}{}{:?}", Some(()), vec![1u8], NonDebuggable) {
-  |                                             ^^^^^^^^^ `Vec<u8>` cannot be formatted with the default formatter
+8 |     match tco::write!(w, "{}{}{:?}", Some(()), vec![1u8], NonDebuggable) {
+  |                                                ^^^^^^^^^ `Vec<u8>` cannot be formatted with the default formatter
   |
   = help: the trait `std::fmt::Display` is not implemented for `Vec<u8>`
   = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
@@ -21,10 +21,10 @@ error[E0277]: `Vec<u8>` doesn't implement `std::fmt::Display`
   = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0277]: `NonDebuggable` doesn't implement `Debug`
- --> $DIR/wrong_types_args.rs:8:56
+ --> $DIR/wrong_types_args.rs:8:59
   |
-8 |     match colored!(w, "{}{}{:?}", Some(()), vec![1u8], NonDebuggable) {
-  |                                                        ^^^^^^^^^^^^^ `NonDebuggable` cannot be formatted using `{:?}`
+8 |     match tco::write!(w, "{}{}{:?}", Some(()), vec![1u8], NonDebuggable) {
+  |                                                           ^^^^^^^^^^^^^ `NonDebuggable` cannot be formatted using `{:?}`
   |
   = help: the trait `Debug` is not implemented for `NonDebuggable`
   = note: add `#[derive(Debug)]` or manually implement `Debug`
