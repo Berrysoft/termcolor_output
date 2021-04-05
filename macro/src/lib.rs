@@ -164,34 +164,74 @@ macro_rules! writeln {
     }}
 }
 
-use std::result::Result;
+use std::ops::{Deref, DerefMut};
 use termcolor::WriteColor;
 
-/// A convenience function, reset the writer before and after
-/// some [`write!`] or [`writeln!`] calls.
+/// A convenience type, reset the writer when dropping.
+///
+/// This type is a bit like [`std::borrow::Cow`], but doesn't require `W` implement [`Clone`]
 ///
 /// ## Examples
 /// ```
 /// use termcolor_output as tco;
 /// # fn write(writer: &mut impl termcolor::WriteColor) {
 /// # use termcolor::Color;
-/// tco::ResetGuard::run(writer, |writer| tco::writeln!(writer, "Hello world with {}some styles!", fg!(Some(Color::Blue)))).unwrap();
+/// {
+///     let mut writer = tco::ResetGuard::Borrowed(writer);
+///     tco::writeln!(writer, "Hello world with {}some styles!", fg!(Some(Color::Blue))).unwrap();
+/// }
 /// tco::writeln!(writer, "No styles here.").unwrap();
 /// # }
 /// ```
-pub struct ResetGuard<E: From<std::io::Error>> {
-    _marker: std::marker::PhantomData<E>,
+#[derive(Debug)]
+pub enum ResetGuard<'a, W: WriteColor> {
+    Borrowed(&'a mut W),
+    Owned(W),
 }
 
-impl<E: From<std::io::Error>> ResetGuard<E> {
-    pub fn run<W, F>(buf: &mut W, func: F) -> Result<(), E>
-    where
-        W: WriteColor,
-        F: FnOnce(&mut W) -> Result<(), E>,
-    {
-        buf.reset()?;
-        func(buf)?;
-        buf.reset()?;
-        Ok(())
+impl<'a, W: WriteColor> ResetGuard<'a, W> {
+    #[inline]
+    pub fn is_borrowed(&self) -> bool {
+        if let Self::Borrowed(_) = self {
+            true
+        } else {
+            false
+        }
+    }
+
+    #[inline]
+    pub fn is_owned(&self) -> bool {
+        if let Self::Owned(_) = self {
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl<'a, W: WriteColor> Drop for ResetGuard<'a, W> {
+    fn drop(&mut self) {
+        let __res = self.reset();
+        debug_assert!(__res.is_ok());
+    }
+}
+
+impl<'a, W: WriteColor> Deref for ResetGuard<'a, W> {
+    type Target = W;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Self::Borrowed(buf) => buf,
+            Self::Owned(ref buf) => buf,
+        }
+    }
+}
+
+impl<'a, W: WriteColor> DerefMut for ResetGuard<'a, W> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        match self {
+            Self::Borrowed(buf) => buf,
+            Self::Owned(ref mut buf) => buf,
+        }
     }
 }
